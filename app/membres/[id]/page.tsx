@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { requireMember } from '@/lib/supabase/server';
 import { prefectureParDep } from '@/lib/data';
 import { photosFor } from '@/lib/photos';
+import MessageBox from '@/components/MessageBox';
 
 async function send(formData: FormData) {
   'use server';
@@ -55,9 +56,7 @@ export default async function Membre({ params, searchParams }: { params: Promise
         {ok && <p className="success">Merci, votre signalement a été transmis à la modération.</p>}
         <form action={send} className="stack">
           <input type="hidden" name="to" value={m.id} />
-          <label>Votre message
-            <textarea name="body" required maxLength={2000} placeholder="Présentez-vous, parlez de vos points communs…" />
-          </label>
+          <MessageBox name={m.display_name} />
           <p className="muted" style={{ fontSize: 13, margin: 0 }}>Premier message : texte uniquement, sans lien ni numéro. Une seule relance si pas de réponse.</p>
           <button className="btn">Envoyer</button>
         </form>

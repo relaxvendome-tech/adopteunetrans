@@ -3,6 +3,7 @@ import { requireMember } from '@/lib/supabase/server';
 import { PREFECTURES } from '@/lib/data';
 import { photosFor } from '@/lib/photos';
 import PhotoManager from '@/components/PhotoManager';
+import DeleteAccount from '@/components/DeleteAccount';
 
 async function save(formData: FormData) {
   'use server';
@@ -47,12 +48,24 @@ export default async function Profil({ searchParams }: { searchParams: Promise<{
   const { sb, user, profile } = await requireMember({ allowNoProfile: true });
   const { e, bienvenue } = await searchParams;
   const photos = profile ? await photosFor(sb, [user.id]) : [];
+  const steps = profile ? [
+    ['Pseudo', !!profile.display_name], ['Département', !!profile.department_code], ['Identité', !!profile.gender_identity],
+    ['Présentation', (profile.bio ?? '').length >= 30], ['Une photo', photos.length > 0], ['3 photos', photos.length >= 3],
+  ] as const : [];
+  const pct = steps.length ? Math.round((steps.filter((x) => x[1]).length / steps.length) * 100) : 0;
   const p = profile ?? {};
   return (
     <section style={{ padding: '32px 0' }}>
       <h1>{profile ? 'Mon profil' : 'Créer mon profil'}</h1>
       {e && <p className="alert">{e}</p>}
       {bienvenue && <p className="success">Bienvenue ! Dernière étape : ajoutez au moins une photo, les profils avec photo reçoivent beaucoup plus de messages. <a href="/membres">Voir les membres →</a></p>}
+      {profile && pct < 100 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <strong>Profil complété à {pct} %</strong>
+          <div style={{ height: 8, background: 'var(--line)', borderRadius: 4, margin: '8px 0' }}><div style={{ width: `${pct}%`, height: 8, background: 'var(--accent)', borderRadius: 4 }} /></div>
+          <span className="muted" style={{ fontSize: 14 }}>À faire : {steps.filter((x) => !x[1]).map((x) => x[0]).join(', ')}</span>
+        </div>
+      )}
       {profile ? <PhotoManager userId={user.id} photos={photos} /> : <p className="card">Après l&apos;enregistrement, vous pourrez ajouter jusqu&apos;à 5 photos.</p>}
       <form action={save} className="stack">
         <label>Prénom ou pseudo
@@ -94,6 +107,7 @@ export default async function Profil({ searchParams }: { searchParams: Promise<{
         )}
         <button className="btn">Enregistrer</button>
       </form>
+      {profile && <DeleteAccount userId={user.id} paths={photos.map((x) => x.storage_path)} />}
     </section>
   );
 }
