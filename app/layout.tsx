@@ -4,10 +4,35 @@ import './globals.css';
 import { SITE } from '@/lib/data';
 import { supabaseServer } from '@/lib/supabase/server';
 
+const KEYWORDS = [
+  'site de rencontre trans', 'rencontre trans', 'rencontre trans gratuit', 'site de rencontre transgenre',
+  'rencontre transgenre', 'rencontre femme trans', 'rencontre homme trans', 'rencontre MTF', 'rencontre FTM',
+  'rencontre non binaire', 'rencontre LGBT', 'appli de rencontre trans', 'rencontre trans France', 'adopte une trans',
+];
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
-  title: { default: `${SITE.name} – rencontres trans respectueuses et vérifiées`, template: `%s | ${SITE.name}` },
-  description: 'Site de rencontre gratuit pour personnes trans et leurs partenaires. Profils vérifiés, messagerie protégée, 18+.',
+  title: { default: `Site de rencontre trans gratuit – ${SITE.name}`, template: `%s | ${SITE.name}` },
+  description: 'Site de rencontre trans gratuit et respectueux : femmes trans, hommes trans, personnes non binaires et leurs partenaires. Messagerie protégée, charte anti-fétichisation, 18+.',
+  keywords: KEYWORDS,
+  applicationName: SITE.name,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website', locale: 'fr_FR', siteName: SITE.name, url: '/',
+    title: `Site de rencontre trans gratuit – ${SITE.name}`,
+    description: 'Rencontres trans respectueuses partout en France. Inscription gratuite, messagerie protégée.',
+  },
+  twitter: { card: 'summary', title: `Site de rencontre trans gratuit – ${SITE.name}`, description: 'Rencontres trans respectueuses partout en France. Inscription gratuite.' },
+  robots: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  formatDetection: { telephone: false },
+};
+
+const JSONLD = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', name: SITE.name, alternateName: 'Site de rencontre trans gratuit', url: SITE.url, inLanguage: 'fr-FR' },
+    { '@type': 'Organization', name: SITE.name, url: SITE.url },
+  ],
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -16,6 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="fr">
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSONLD) }} />
         <header className="top">
           <div className="wrap">
             <Link href="/" className="logo">{SITE.name}</Link>

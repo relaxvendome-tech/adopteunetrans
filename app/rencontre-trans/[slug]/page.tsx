@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { PREFECTURES, contenuVille, prefectureParSlug } from '@/lib/data';
+import { PREFECTURES, SITE, contenuVille, prefectureParSlug } from '@/lib/data';
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -16,7 +16,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: p.title,
     description: p.meta_description,
+    keywords: (p as { keywords?: string[] }).keywords,
     alternates: { canonical: p.url },
+    openGraph: { type: 'website', locale: 'fr_FR', url: p.url, title: p.title, description: p.meta_description },
     // Priorité 2 : non indexée tant que la page n'a pas de contenu propre (évite les « doorway pages »).
     robots: indexable ? undefined : { index: false, follow: true },
   };
@@ -31,13 +33,22 @@ export default async function Ville({ params }: { params: Promise<{ slug: string
 
   return (
     <article style={{ padding: '32px 0' }} className="prose">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: SITE.url },
+          { '@type': 'ListItem', position: 2, name: 'Rencontre trans par ville', item: `${SITE.url}/rencontre-trans` },
+          { '@type': 'ListItem', position: 3, name: `Rencontre trans ${p.prefecture}`, item: `${SITE.url}${p.url}` },
+        ],
+      }) }} />
+      <nav aria-label="Fil d'Ariane" className="muted" style={{ fontSize: 14 }}><a href="/">Accueil</a> › <a href="/rencontre-trans">Rencontre trans par ville</a> › {p.prefecture}</nav>
       <h1>{p.h1}</h1>
       <p className="muted">{p.departement} ({p.code_dep}) · {p.region}</p>
       {c ? (
         <>
           <p>{c.intro}</p>
           <div className="card"><strong>Conseil sécurité :</strong> {c.conseil_securite}</div>
-          <h2>Autour de {p.prefecture}</h2>
+          <h2>Rencontre trans autour de {p.prefecture}</h2>
           <p>{c.villes_voisines.join(' · ')}</p>
         </>
       ) : (
@@ -50,7 +61,7 @@ export default async function Ville({ params }: { params: Promise<{ slug: string
       <p style={{ margin: '28px 0' }}><Link className="btn" href="/connexion">Rejoindre gratuitement</Link></p>
       {voisines.length > 0 && (
         <>
-          <h2>Ailleurs en {p.region}</h2>
+          <h2>Rencontre trans ailleurs en {p.region}</h2>
           <p style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px' }}>
             {voisines.map((v) => <Link key={v.slug} href={v.url}>Rencontre trans à {v.prefecture}</Link>)}
           </p>

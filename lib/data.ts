@@ -13,7 +13,7 @@ export const prefectureParDep = (code: string | null | undefined) =>
 
 export const SITE = {
   name: 'Adopte une trans',
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://adopteunetrans.com',
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'https://adopteunetrans.com'),
 };
 
 export function age(birthdate: string) {

@@ -10,7 +10,7 @@ export default function Home() {
         <p className="muted" style={{ fontWeight: 600, color: 'var(--accent)', letterSpacing: '.05em', textTransform: 'uppercase', fontSize: 13 }}>
           Rencontres trans · gratuit · 18+
         </p>
-        <h1>Des rencontres où l&apos;on vous respecte, vraiment.</h1>
+        <h1>Site de rencontre trans gratuit : des rencontres où l&apos;on vous respecte, vraiment.</h1>
         <p className="muted" style={{ fontSize: 18, maxWidth: 620, lineHeight: 1.55 }}>
           Femmes trans, hommes trans, personnes non binaires et celles et ceux qui les aiment.
           Inscription gratuite, messagerie protégée, charte anti-fétichisation.
@@ -22,7 +22,7 @@ export default function Home() {
       </section>
 
       <section id="securite" className="grid" style={{ margin: '24px 0 40px' }}>
-        <div className="card"><h2 style={{ marginTop: 0 }}>Messagerie protégée</h2><p className="muted">Les premiers messages arrivent dans « Demandes » : pas de lien ni de numéro, une seule relance, filtre « profils vérifiés uniquement ».</p></div>
+        <div className="card"><h2 style={{ marginTop: 0 }}>Messagerie protégée</h2><p className="muted">Les premiers messages arrivent dans « Demandes » : pas de lien ni de numéro, une seule relance, et vous choisissez qui peut vous écrire.</p></div>
         <div className="card"><h2 style={{ marginTop: 0 }}>Respect avant tout</h2><p className="muted">Charte anti-fétichisation, blocage et signalement en un clic, modération humaine.</p></div>
         <div className="card"><h2 style={{ marginTop: 0 }}>Vos données protégées</h2><p className="muted">Hébergement en Europe. Votre date de naissance et votre position ne sont jamais visibles par les autres membres.</p></div>
       </section>
