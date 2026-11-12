@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 import { requireMember } from '@/lib/supabase/server';
 import { PREFECTURES } from '@/lib/data';
+import { photosFor } from '@/lib/photos';
+import PhotoManager from '@/components/PhotoManager';
 
 async function save(formData: FormData) {
   'use server';
@@ -38,17 +40,20 @@ async function save(formData: FormData) {
       redirect('/profil?e=' + encodeURIComponent('Date de naissance invalide : le site est réservé aux 18 ans et plus.'));
     }
   }
-  redirect('/membres');
+  redirect(profile ? '/membres' : '/profil?bienvenue=1');
 }
 
-export default async function Profil({ searchParams }: { searchParams: Promise<{ e?: string }> }) {
-  const { profile } = await requireMember({ allowNoProfile: true });
-  const { e } = await searchParams;
+export default async function Profil({ searchParams }: { searchParams: Promise<{ e?: string; bienvenue?: string }> }) {
+  const { sb, user, profile } = await requireMember({ allowNoProfile: true });
+  const { e, bienvenue } = await searchParams;
+  const photos = profile ? await photosFor(sb, [user.id]) : [];
   const p = profile ?? {};
   return (
     <section style={{ padding: '32px 0' }}>
       <h1>{profile ? 'Mon profil' : 'Créer mon profil'}</h1>
       {e && <p className="alert">{e}</p>}
+      {bienvenue && <p className="success">Bienvenue ! Dernière étape : ajoutez au moins une photo, les profils avec photo reçoivent beaucoup plus de messages. <a href="/membres">Voir les membres →</a></p>}
+      {profile ? <PhotoManager userId={user.id} photos={photos} /> : <p className="card">Après l&apos;enregistrement, vous pourrez ajouter jusqu&apos;à 5 photos.</p>}
       <form action={save} className="stack">
         <label>Prénom ou pseudo
           <input name="display_name" required maxLength={50} defaultValue={p.display_name ?? ''} />
@@ -72,7 +77,7 @@ export default async function Profil({ searchParams }: { searchParams: Promise<{
         </label>
         <fieldset className="card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <legend style={{ fontWeight: 600 }}>Qui peut m&apos;écrire</legend>
-          <label className="check"><input type="checkbox" name="accept_only_verified" defaultChecked={p.accept_only_verified ?? true} /> Uniquement les profils vérifiés</label>
+          <label className="check"><input type="checkbox" name="accept_only_verified" defaultChecked={p.accept_only_verified ?? false} /> Uniquement les profils vérifiés</label>
           <div style={{ display: 'flex', gap: 12 }}>
             <label>Âge min<input type="number" name="age_min" min={18} max={120} defaultValue={p.age_min ?? 18} /></label>
             <label>Âge max<input type="number" name="age_max" min={18} max={120} defaultValue={p.age_max ?? 99} /></label>

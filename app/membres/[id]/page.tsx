@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { requireMember } from '@/lib/supabase/server';
 import { prefectureParDep } from '@/lib/data';
+import { photosFor } from '@/lib/photos';
 
 async function send(formData: FormData) {
   'use server';
@@ -35,12 +36,14 @@ export default async function Membre({ params, searchParams }: { params: Promise
   const { data } = await sb.rpc('member_card', { p_id: id });
   const m = data?.[0];
   if (!m) notFound();
+  const photos = await photosFor(sb, [id]);
   await sb.from('profile_views').insert({ viewer_id: user.id, viewed_id: id });
 
   return (
     <section style={{ padding: '32px 0', display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))' }}>
       <div className="card">
-        <div className="avatar" aria-hidden="true" style={{ height: 220 }}>{m.display_name.slice(0, 1).toUpperCase()}</div>
+        {photos[0] ? <img className="avatar" style={{ height: 360 }} src={photos[0].url} alt={`Photo de ${m.display_name}`} /> : <div className="avatar" aria-hidden="true" style={{ height: 220 }}>{m.display_name.slice(0, 1).toUpperCase()}</div>}
+        {photos.length > 1 && <div className="gallery">{photos.slice(1).map((p) => <a key={p.id} href={p.url} target="_blank" rel="noreferrer"><img src={p.url} alt="" /></a>)}</div>}
         <h1 style={{ fontSize: 28, marginBottom: 4 }}>{m.display_name}, {m.age}</h1>
         <p className="muted">{[m.gender_identity, m.pronouns, prefectureParDep(m.department_code)?.prefecture].filter(Boolean).join(' · ')}</p>
         {m.is_verified && <span className="badge">Profil vérifié</span>}

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireMember } from '@/lib/supabase/server';
 import { PREFECTURES, prefectureParDep } from '@/lib/data';
+import { photosFor } from '@/lib/photos';
 
 type Member = { id: string; display_name: string; age: number; gender_identity: string | null; pronouns: string | null; bio: string | null; department_code: string | null; is_verified: boolean; online: boolean };
 
@@ -10,6 +11,7 @@ export default async function Membres({ searchParams }: { searchParams: Promise<
   const current = dep === 'all' ? null : dep ?? profile.department_code;
   const { data, error } = await sb.rpc('list_members', { p_dep: current, p_limit: 60 });
   const members = (data ?? []) as Member[];
+  const mains = new Map((await photosFor(sb, members.map((m) => m.id), true)).map((p) => [p.profile_id, p.url]));
   await sb.from('profiles').update({ last_active_at: new Date().toISOString() }).eq('id', profile.id);
 
   return (
@@ -29,7 +31,7 @@ export default async function Membres({ searchParams }: { searchParams: Promise<
         <div className="grid">
           {members.map((m) => (
             <article key={m.id} className="card">
-              <div className="avatar" aria-hidden="true">{m.display_name.slice(0, 1).toUpperCase()}</div>
+              {mains.get(m.id) ? <img className="avatar" src={mains.get(m.id)} alt={`Photo de ${m.display_name}`} /> : <div className="avatar" aria-hidden="true">{m.display_name.slice(0, 1).toUpperCase()}</div>}
               <h2 style={{ fontSize: 18, margin: '12px 0 4px' }}>{m.display_name}, {m.age}</h2>
               <p className="muted" style={{ margin: 0, fontSize: 14 }}>
                 {[m.gender_identity, m.pronouns, prefectureParDep(m.department_code)?.prefecture].filter(Boolean).join(' · ')}

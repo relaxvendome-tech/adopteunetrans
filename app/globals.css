@@ -36,3 +36,11 @@ footer.bottom{border-top:1px solid var(--line);background:#fff;margin-top:64px;p
 footer.bottom .links{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:10px}
 .prose{max-width:760px;line-height:1.6}
 .prose h1{font-size:32px}.prose h2{font-size:22px;margin-top:28px}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.ph{margin:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#fff;display:flex;flex-direction:column}
+.ph img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.ph figcaption{display:flex;gap:6px;justify-content:space-between;padding:6px;flex-wrap:wrap}
+.ph.add{aspect-ratio:3/4;align-items:center;justify-content:center;cursor:pointer;color:var(--accent);font-weight:600;border-style:dashed}
+img.avatar{object-fit:cover;padding:0}
+.gallery{display:flex;gap:8px;overflow-x:auto;margin-top:8px}
+.gallery img{width:72px;height:96px;object-fit:cover;border-radius:8px}
